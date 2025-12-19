@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1st Greywatch | Personnel</title>
+    <style>
+        /* --- SHARED CSS (SAME AS INDEX) --- */
+        :root {
+            --bg-color: #0b0c10;
+            --panel-color: #1f2833;
+            --text-color: #c5c6c7;
+            --accent-color: #66fcf1;
+            --secondary-accent: #45a29e;
+            --rank-gold: #ffd700;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+            background-image: 
+                linear-gradient(rgba(11, 12, 16, 0.9), rgba(11, 12, 16, 0.95)),
+                url('https://robertsspaceindustries.com/media/89396t3x5r2yjr/source/Star-Citizen-Alpha-318-Leaving-Orison.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        /* NAVIGATION BAR */
+        nav {
+            background: rgba(11, 12, 16, 1);
+            border-bottom: 2px solid var(--secondary-accent);
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 20px;
+            text-transform: uppercase;
+            font-family: 'Courier New', Courier, monospace;
+            border: 1px solid transparent;
+            padding: 5px 15px;
+            transition: 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* ROSTER GRID */
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .member-card {
+            background: rgba(31, 40, 51, 0.8);
+            border: 1px solid var(--secondary-accent);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .member-card:hover {
+            border-color: var(--accent-color);
+            background: rgba(31, 40, 51, 1);
+        }
+
+        /* AVATAR CIRCLE */
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background-color: #000;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .rank {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary-accent);
+            margin-bottom: 2px;
+        }
+
+        .name {
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .role {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .status-light {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #555;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            box-shadow: 0 0 5px currentColor;
+        }
+
+        /* STATUS COLORS */
+        .status-online { background-color: #00ff00; color: #00ff00; }
+        .status-offline { background-color: #555; color: #555; }
+        .status-mia { background-color: #ff0000; color: #ff0000; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">/// LOGS</a>
+        <a href="roster.html" class="active">/// ROSTER</a>
+    </nav>
+
+    <div class="container">
+        <h2>Active Duty Personnel</h2>
+        
+        <div class="roster-grid" id="roster-container"></div>
+    </div>
+
+    <script>
+        // --- CONFIG: ADD MEMBERS HERE ---
+        const members = [
+            {
+                name: "Viper",
+                rank: "Commander",
+                role: "Division Lead / Idris Captain",
+                status: "online" // options: online, offline, mia
+            },
+            {
+                name: "Ghost",
+                rank: "Lieutenant",
+                role: "Recon / Stealth Ops",
+                status: "offline"
+            },
+            {
+                name: "Heavy",
+                rank: "Sergeant",
+                role: "Ballistics / Salvage",
+                status: "online"
+            },
+            {
+                name: "Rook",
+                rank: "Cadet",
+                role: "Fighter Pilot",
+                status: "mia"
+            }
+        ];
+
+        // --- RENDER LOGIC ---
+        const container = document.getElementById('roster-container');
+
+        members.forEach(member => {
+            // Get first letter for avatar
+            const initial = member.name.charAt(0);
+            
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            
+            card.innerHTML = `
+                <div class="status-light status-${member.status}"></div>
+                <div class="avatar">${initial}</div>
+                <div class="info">
+                    <div class="rank">${member.rank}</div>
+                    <div class="name">${member.name}</div>
+                    <div class="role">// ${member.role}</div>
+                </div>
+            `;
+            
+            container.appendChild(card);
+        });
+    </script>
+
+</body>
+</html>
