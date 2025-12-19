@@ -168,15 +168,25 @@
     <script>
         const feedContainer = document.getElementById('log-feed');
 
-        // Fetch the external JSON file
-        fetch('logs.json')
-            .then(response => response.json())
+        // We add ?v=TIMESTAMP to the filename. 
+        // This forces the browser to think it's a "new" file every time you refresh.
+        const cacheBuster = new Date().getTime();
+
+        fetch(`logs.json?v=${cacheBuster}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+                return response.json();
+            })
             .then(logs => {
-                // Determine if we need to reverse the order (newest first)
-                // Remove .reverse() if you want oldest first
                 logs.reverse().forEach(log => {
                     const entryDiv = document.createElement('div');
                     entryDiv.className = 'log-entry';
+
+                    // Safe check for classification color
+                    const isClassified = log.classification && log.classification.toLowerCase().includes('classified');
+                    const color = isClassified ? '#ff3b3b' : 'var(--accent-color)';
 
                     entryDiv.innerHTML = `
                         <div class="corner-decor top-right"></div>
@@ -185,7 +195,7 @@
                             <span>DATE: ${log.date}</span>
                             <span>LOC: ${log.location}</span>
                         </div>
-                        <div class="classification" style="color: ${log.classification === 'Classified' ? '#ff3b3b' : 'var(--accent-color)'}">${log.classification}</div>
+                        <div class="classification" style="color: ${color}">${log.classification || 'Public'}</div>
                         <div class="log-title">${log.title}</div>
                         <div class="log-content">
                             <p>${log.content}</p>
@@ -198,7 +208,13 @@
             })
             .catch(error => {
                 console.error('Error loading logs:', error);
-                feedContainer.innerHTML = '<p style="color:red;">ERROR: CONNECTION TO ARCHIVES SEVERED (Could not load logs.json)</p>';
+                // More descriptive error message for you to see on screen
+                feedContainer.innerHTML = `<p style="color:red; border:1px solid red; padding:10px;">
+                    ERROR: COULD NOT LOAD LOGS.<br>
+                    1. Check if 'logs.json' exists in your repo.<br>
+                    2. Check Console (F12) for details.<br>
+                    Details: ${error.message}
+                </p>`;
             });
     </script>
 </body>
