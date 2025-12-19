@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1st Greywatch | Logistics Exchange</title>
+    <style>
+        /* --- SHARED CSS --- */
+        :root {
+            --bg-color: #0b0c10;
+            --text-color: #c5c6c7;
+            --accent-color: #66fcf1;
+            --secondary-accent: #45a29e;
+            --price-color: #ffd700; /* Gold for currency */
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+            background-image: linear-gradient(rgba(11, 12, 16, 0.92), rgba(11, 12, 16, 0.92)), url('https://robertsspaceindustries.com/media/89396t3x5r2yjr/source/Star-Citizen-Alpha-318-Leaving-Orison.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        /* HEADER & NAV STYLES (Same as others) */
+        header { border-bottom: 2px solid var(--accent-color); padding: 20px; background: rgba(11, 12, 16, 0.95); text-align: center; }
+        h1 { color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        
+        /* MARKET GRID */
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        
+        /* ITEM CARD */
+        .item-card {
+            background: rgba(31, 40, 51, 0.9);
+            border: 1px solid var(--secondary-accent);
+            position: relative;
+            padding: 20px;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .item-card:hover { border-color: var(--accent-color); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(102, 252, 241, 0.1); }
+        
+        .item-name { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 5px; text-transform: uppercase; }
+        .item-price { font-size: 1.1rem; color: var(--price-color); font-family: 'Courier New', monospace; font-weight: bold; margin-bottom: 15px; }
+        .seller-info { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; border-top: 1px solid #444; padding-top: 10px; }
+        
+        /* BUY BUTTON */
+        .contact-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 8px;
+            text-align: center;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .contact-btn:hover { background: var(--accent-color); color: #000; }
+
+        .item-id { position: absolute; top: 10px; right: 10px; font-size: 0.7rem; color: #555; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Logistics Exchange</h1>
+    </header>
+
+    <nav id="nav-placeholder"></nav>
+
+    <div class="container">
+        <h2 style="color: white; border-bottom: 1px solid #444; padding-bottom: 10px;">Available Requisitions</h2>
+        <div id="market-feed" class="market-grid"></div>
+    </div>
+
+    <script>
+        const feedContainer = document.getElementById('market-feed');
+        const cacheBuster = new Date().getTime();
+
+        fetch(`market.json?v=${cacheBuster}`)
+            .then(res => res.json())
+            .then(items => {
+                if(items.length === 0) {
+                    feedContainer.innerHTML = "<p style='color:#666;'>No items currently listed for exchange.</p>";
+                    return;
+                }
+
+                items.reverse().forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+
+                    // Format price with commas (e.g. 1,000,000)
+                    const formattedPrice = parseInt(item.price).toLocaleString();
+
+                    card.innerHTML = `
+                        <div class="item-id">ID: ${item.id}</div>
+                        <div>
+                            <div class="item-name">${item.item_name}</div>
+                            <div class="item-price">${formattedPrice} aUEC</div>
+                            <div class="seller-info">
+                                // SELLER: ${item.seller}<br>
+                                // STATUS: AVAILABLE
+                            </div>
+                        </div>
+                        <a href="https://discord.com/channels/@me" target="_blank" class="contact-btn">
+                            Contact Seller
+                        </a>
+                    `;
+                    feedContainer.appendChild(card);
+                });
+            })
+            .catch(err => console.error(err));
+    </script>
+</body>
+</html>
