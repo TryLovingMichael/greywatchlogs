@@ -167,26 +167,24 @@
     </footer>
     <script>
         const feedContainer = document.getElementById('log-feed');
-
-        // We add ?v=TIMESTAMP to the filename. 
-        // This forces the browser to think it's a "new" file every time you refresh.
         const cacheBuster = new Date().getTime();
 
         fetch(`logs.json?v=${cacheBuster}`)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP error " + response.status);
-                }
+                if (!response.ok) throw new Error("HTTP error " + response.status);
                 return response.json();
             })
             .then(logs => {
                 logs.reverse().forEach(log => {
                     const entryDiv = document.createElement('div');
                     entryDiv.className = 'log-entry';
-
-                    // Safe check for classification color
+                    
+                    // Handle color
                     const isClassified = log.classification && log.classification.toLowerCase().includes('classified');
                     const color = isClassified ? '#ff3b3b' : 'var(--accent-color)';
+
+                    // Use the ID if it exists, otherwise show 'OLD-LOG'
+                    const logId = log.id || 'N/A';
 
                     entryDiv.innerHTML = `
                         <div class="corner-decor top-right"></div>
@@ -199,7 +197,10 @@
                         <div class="log-title">${log.title}</div>
                         <div class="log-content">
                             <p>${log.content}</p>
-                            <p style="margin-top: 15px; font-size: 0.8rem; color: #666;">// SIGNED: ${log.author}</p>
+                            <div style="display:flex; justify-content:space-between; margin-top: 15px; font-size: 0.8rem; color: #666; font-family:'Courier New';">
+                                <span>// SIGNED: ${log.author}</span>
+                                <span>ID: ${logId}</span>
+                            </div>
                         </div>
                     `;
 
@@ -207,14 +208,8 @@
                 });
             })
             .catch(error => {
-                console.error('Error loading logs:', error);
-                // More descriptive error message for you to see on screen
-                feedContainer.innerHTML = `<p style="color:red; border:1px solid red; padding:10px;">
-                    ERROR: COULD NOT LOAD LOGS.<br>
-                    1. Check if 'logs.json' exists in your repo.<br>
-                    2. Check Console (F12) for details.<br>
-                    Details: ${error.message}
-                </p>`;
+                console.error('Error:', error);
+                feedContainer.innerHTML = '<p style="color:red;">CONNECTION SEVERED.</p>';
             });
     </script>
 </body>
