@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1st Greywatch Division | Archives</title>
+    <style>
+        /* --- STAR CITIZEN THEME CSS --- */
+        :root {
+            --bg-color: #0b0c10;
+            --panel-color: #1f2833;
+            --text-color: #c5c6c7;
+            --accent-color: #66fcf1; /* Cyan/Teal */
+            --secondary-accent: #45a29e;
+            --alert-color: #ff3b3b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                linear-gradient(rgba(11, 12, 16, 0.9), rgba(11, 12, 16, 0.9)),
+                url('https://robertsspaceindustries.com/media/89396t3x5r2yjr/source/Star-Citizen-Alpha-318-Leaving-Orison.jpg'); /* Placeholder SC Background */
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+
+        /* Scanline effect overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-color);
+            padding: 20px;
+            background: rgba(11, 12, 16, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* LOG ENTRY STYLING */
+        .log-entry {
+            background-color: rgba(31, 40, 51, 0.85);
+            border-left: 4px solid var(--accent-color);
+            margin-bottom: 30px;
+            padding: 20px;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        .log-entry:hover {
+            transform: translateX(5px);
+            box-shadow: -5px 0 15px rgba(102, 252, 241, 0.2);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--secondary-accent);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        .log-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .log-content {
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .classification {
+            display: inline-block;
+            padding: 2px 8px;
+            border: 1px solid var(--secondary-accent);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary-accent);
+            font-size: 0.8rem;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Decorative "Corner" pieces for sci-fi look */
+        .corner-decor {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--accent-color);
+        }
+        .top-right { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>1st Greywatch Division</h1>
+        <div style="font-family: 'Courier New'; font-size: 0.8rem;">
+            SYSTEM STATUS: <span style="color: var(--accent-color);">ONLINE</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div style="margin-bottom: 50px; border-bottom: 1px solid #444; padding-bottom: 20px;">
+            <h2 style="color: white; text-transform: uppercase;">Mission Archives & Lore</h2>
+            <p>Welcome to the encrypted data stores of the 1st Greywatch Division. Below you will find daily operational logs, after-action reports, and historical records.</p>
+        </div>
+
+        <div id="log-feed"></div>
+    </div>
+
+    <footer>
+        UEE NAVY // AUTHORIZED PERSONNEL ONLY<br>
+        1ST GREYWATCH DIVISION © 2955
+    </footer>
+
+    <script>
+        // --- CONFIGURATION: ADD YOUR LORE HERE ---
+        
+        const logs = [
+            {
+                date: "2955-01-15",
+                location: "Stanton System // MicroTech Orbit",
+                author: "Cmdr. V. Raske",
+                title: "Operation: Cold Snap",
+                content: "The division touched down at New Babbage amidst a severe blizzard. Visibility was near zero. Our objective was to secure a contract with MicroTech protection services. The mood in the mess hall is tense; the Vanduul threat in neighboring systems is causing supply chain issues for our quantum fuel.",
+                classification: "Low Security"
+            },
+            {
+                date: "2955-01-18",
+                location: "Pyro Jump Point",
+                author: "Lt. J. 'Ghost' Miller",
+                title: "Reconnaissance Report",
+                content: "Scanners picked up three unidentified signatures near the jump gate. Signatures matched Drake Cutlass emissions—likely pirates looking for easy haulers. 1st Greywatch fighters scrambled to intercept. Hostiles jumped away before engagement. We are maintaining a yellow alert status.",
+                classification: "Classified"
+            },
+            {
+                date: "2955-01-20",
+                location: "Daymar // Shubin Mining Facility",
+                author: "Logistics Officer K. Chen",
+                title: "Supply Run Interruption",
+                content: "While loading refined Quantanium, we experienced a mechanical failure on the loading ramp of the C2 Hercules. Repairs took 4 hours. Local security was edgy, but no incidents occurred. The sunset over Daymar remains one of the few perks of this job.",
+                classification: "Public"
+            }
+        ];
+
+        // --- DO NOT TOUCH BELOW THIS LINE (Unless you know JS) ---
+
+        const feedContainer = document.getElementById('log-feed');
+
+        logs.forEach(log => {
+            // Create the HTML structure for each log
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'log-entry';
+
+            entryDiv.innerHTML = `
+                <div class="corner-decor top-right"></div>
+                <div class="corner-decor bottom-left"></div>
+                <div class="log-header">
+                    <span>DATE: ${log.date}</span>
+                    <span>LOC: ${log.location}</span>
+                </div>
+                <div class="classification" style="color: ${log.classification === 'Classified' ? '#ff3b3b' : 'var(--accent-color)'}">${log.classification}</div>
+                <div class="log-title">${log.title}</div>
+                <div class="log-content">
+                    <p>${log.content}</p>
+                    <p style="margin-top: 15px; font-size: 0.8rem; color: #666;">// SIGNED: ${log.author}</p>
+                </div>
+            `;
+
+            feedContainer.appendChild(entryDiv);
+        });
+    </script>
+</body>
+</html>
